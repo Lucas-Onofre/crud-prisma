@@ -1,15 +1,5 @@
-import nodemailer from 'nodemailer';
-import 'dotenv/config';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+import { logger } from '../../shared/utils/logger';
+import { transporter } from '../../shared/utils/emailtransporter';
 
 type ConfirmationEmailInput = {
   email: string;
@@ -29,7 +19,7 @@ export const sendConfirmationEmail = async ({
     html: `
       <h1>Hi ${name}</h1>
       <p>Click the link below to confirm your email</p>
-      <a href="http://localhost:3000/auth/confirm/${token}">Confirm your email</a>
+      <a href="http://localhost:3000/confirm/${token}">Confirm your email</a>
 
       <p>Thanks!</p>
     `,
@@ -37,13 +27,12 @@ export const sendConfirmationEmail = async ({
 
   try {
     transporter.sendMail(mailOptions, (err: any, info: any) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(info);
+      if (!err) {
+        // logger.error(err.message, { stack: err.stack });
+        logger.error('teste');
       }
     });
-  } catch (e) {
-    console.log(e);
+  } catch (err: any) {
+    logger.error(err.message, { stack: err.stack });
   }
 };
