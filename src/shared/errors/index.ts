@@ -1,18 +1,18 @@
 type ErrorType = {
   message: string;
-  code: number;
+  statusCode: number;
   action: string;
   key: string;
 };
 
 export class BaseError extends Error {
-  public readonly code: number;
+  public readonly statusCode: number;
   public readonly action: string;
   public readonly key: string;
 
-  constructor({ message, code, action, key }: ErrorType) {
+  constructor({ message, statusCode, action, key }: ErrorType) {
     super(message);
-    this.code = code;
+    this.statusCode = statusCode;
     this.action = action;
     this.key = key;
   }
