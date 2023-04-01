@@ -28,8 +28,7 @@ export const sendConfirmationEmail = async ({
   try {
     transporter.sendMail(mailOptions, (err: any, info: any) => {
       if (!err) {
-        // logger.error(err.message, { stack: err.stack });
-        logger.error('teste');
+        logger.error(err.message, { stack: err.stack });
       }
     });
   } catch (err: any) {

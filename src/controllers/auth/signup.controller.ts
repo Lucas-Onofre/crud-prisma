@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { Request, Response } from 'express';
 
-import { BaseError } from '../../shared/errors';
+// import { BaseError } from '../../shared/errors';
 import { sendConfirmationEmail } from '../../services/auth/emailService';
 
 const prisma = new PrismaClient();
@@ -18,31 +18,49 @@ type IUserSignUp = {
 
 export const signUp = async (req: Request, res: Response) => {
   try {
-    const r = await sendConfirmationEmail({
-      email: 'lucasxxonofre@gmail.com',
-      name: 'Lucas',
-      token: 'rdlsaopdkaspoda',
+    const { email, name, password }: IUserSignUp = req.body;
+
+    await validateUser(email);
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const userId = v4();
+    const user = await prisma.user.create({
+      data: {
+        id: userId,
+        name,
+        email,
+        password: hashedPassword,
+      },
     });
 
-    return res.json({ r });
+    const confirmationToken = v4();
+    await prisma.confirmationToken.create({
+      data: {
+        id: v4(),
+        token: confirmationToken,
+        userId,
+      },
+    });
 
-    // const { email, name, password }: IUserSignUp = req.body;
-    // await validateUser(email);
-    // const saltRounds = 10;
-    // const hashedPassword = await bcrypt.hash(password, saltRounds);
-    // const userId = v4();
-    // const user = await prisma.user.create({
-    //   data: {
-    //     id: userId,
-    //     name,
-    //     email,
-    //     password: hashedPassword,
-    //   },
-    // });
-  } catch (error: BaseError | any) {
-    return res
-      .status(error.code)
-      .json({ message: error.message, key: error.key });
+    sendConfirmationEmail({
+      email,
+      name,
+      token: confirmationToken,
+    });
+
+    return res.status(201).json({
+      data: {
+        name: user.name,
+        email: user.email,
+      },
+      status: 'success',
+      message:
+        'User created successfully. Please check your e-mail to verify account.',
+    });
+  } catch (err: any) {
+    return res.status(400).json({ message: err.message, key: err.key });
   }
 };
 
@@ -52,11 +70,12 @@ const validateUser = async (email: string) => {
   });
 
   if (userExists) {
-    throw new BaseError({
-      message: 'This e-mail is already in use.',
-      code: 400,
-      action: '',
-      key: 'user',
-    });
+    throw new Error('This e-mail is already in use.');
+    // throw new BaseError({
+    //   message: 'This e-mail is already in use.',
+    //   code: 400,
+    //   action: '',
+    //   key: 'user',
+    // });
   }
 };
