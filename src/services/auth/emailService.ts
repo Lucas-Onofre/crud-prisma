@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import 'dotenv/config';
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: process.env.SMTP_HOST,
   port: 465,
   secure: true,
   auth: {
@@ -27,19 +27,23 @@ export const sendConfirmationEmail = async ({
     to: email,
     subject: 'Hi there! To start using our app, please confirm your email',
     html: `
-          <h1>Hi ${name}</h1>
-          <p>Click the link below to confirm your email</p>
-          <a href="http://localhost:3000/confirm/${token}">Confirm your email</a>
-      `,
+      <h1>Hi ${name}</h1>
+      <p>Click the link below to confirm your email</p>
+      <a href="http://localhost:3000/auth/confirm/${token}">Confirm your email</a>
+
+      <p>Thanks!</p>
+    `,
   };
 
-  transporter.sendMail(mailOptions, (err: any, info: any) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(info);
-    }
-  });
-
-  return true;
+  try {
+    transporter.sendMail(mailOptions, (err: any, info: any) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(info);
+      }
+    });
+  } catch (e) {
+    console.log(e);
+  }
 };
