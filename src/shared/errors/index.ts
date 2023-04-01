@@ -5,7 +5,7 @@ type ErrorType = {
   key: string;
 };
 
-class BaseError extends Error {
+export class BaseError extends Error {
   public readonly code: number;
   public readonly action: string;
   public readonly key: string;
