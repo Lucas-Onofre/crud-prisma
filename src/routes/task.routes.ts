@@ -2,10 +2,10 @@ import { Router } from 'express';
 
 import { auth } from '../middlewares/auth';
 
+import { listUser } from '../controllers/user/listUser.controller';
+
 const routes = Router();
 
-routes.get('/', auth, (req, res) => {
-  res.send('Hello World!');
-});
+routes.get('/', auth, listUser);
 
 export default routes;

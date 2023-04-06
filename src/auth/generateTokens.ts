@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { IUser } from '../interfaces/IUser';
 
 const jwt_secret = process.env.JWT_SECRET as string;
-const jwt_refresh_secret = process.env.JWT_REFRESH_SECRET as string;
 
 export const generateTokens = (user: IUser) => {
   const accessToken = jwt.sign(
@@ -26,7 +25,7 @@ export const generateTokens = (user: IUser) => {
       name: user.name,
       confirmed: user.confirmed,
     },
-    jwt_refresh_secret,
+    jwt_secret,
     {
       expiresIn: '7d',
     }
