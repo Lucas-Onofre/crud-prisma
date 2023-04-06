@@ -27,9 +27,6 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = verify(token, jwt_secret) as IPayload;
 
-    //verificar se o token expirou, e caso tenha expirado, gerar um novo token e atualizar o token do usuário no banco de dados
-    //verificar se o usuário existe no banco de dados
-
     const user = await prisma.user.findUnique({
       where: {
         id,
@@ -39,6 +36,13 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     if (!user) {
       return res.status(401).send({ message: 'Unauthorized' });
     }
+
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      confirmed: user.confirmed,
+    };
 
     return next();
   } catch (err: any) {
