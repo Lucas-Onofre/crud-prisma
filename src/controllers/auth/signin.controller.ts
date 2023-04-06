@@ -7,9 +7,14 @@ const prisma = new PrismaClient();
 
 import { generateTokens } from '../../auth/generateTokens';
 
+type IUserSignin = {
+  email: string;
+  password: string;
+};
+
 export const signIn = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, password }: IUserSignin = req.body;
 
     const user = await prisma.user.findUnique({
       where: {

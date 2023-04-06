@@ -3,9 +3,13 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
+type IUserSignout = {
+  userId: string;
+};
+
 export const signOut = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.body;
+    const { userId }: IUserSignout = req.body;
 
     if (!userId) {
       return res.status(400).send({ message: 'Invalid user' });
