@@ -6,7 +6,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 interface IPayload {
-  userId: string;
+  id: string;
+  email: string;
+  confirmed: boolean;
+  iat: number;
+  exp: number;
 }
 
 const jwt_secret = process.env.JWT_SECRET as string;
@@ -21,11 +25,11 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   const [, token] = authorization.split(' ');
 
   try {
-    const { userId } = verify(token, jwt_secret) as IPayload;
+    const { id } = verify(token, jwt_secret) as IPayload;
 
     const user = await prisma.user.findUnique({
       where: {
-        id: userId,
+        id,
       },
     });
 
