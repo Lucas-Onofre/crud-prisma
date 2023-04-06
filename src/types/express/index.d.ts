@@ -1,7 +1,5 @@
 import { Request } from 'express';
 
-import { IUser } from 'src/interfaces/IUser';
-
 export {};
 
 type UserInfo = {
