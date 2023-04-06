@@ -1,9 +1,13 @@
+import { Request, Response } from 'express';
+
 import bcrypt from 'bcrypt';
 import { v4 } from 'uuid';
+
 import { PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
-import { sendConfirmationEmail } from '../../services/auth/emailService';
 const prisma = new PrismaClient();
+
+import { sendConfirmationEmail } from '../../services/auth/emailService';
+import { generateTokens } from '../../auth/generateTokens';
 
 type IUserSignUp = {
   email: string;
@@ -45,10 +49,21 @@ export const signUp = async (req: Request, res: Response) => {
       token: confirmationToken,
     });
 
+    const { accessToken, refreshToken } = generateTokens(user);
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refreshToken,
+      },
+    });
+
     return res.status(201).send({
       data: {
-        name: user.name,
-        email: user.email,
+        accessToken,
+        refreshToken,
       },
       status: 'success',
       message:

@@ -3,7 +3,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  refreshToken: string;
+  refreshToken: string | null;
   confirmed: boolean;
   createdAt: Date;
   updatedAt: Date;
